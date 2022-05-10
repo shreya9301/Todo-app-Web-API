@@ -1,6 +1,5 @@
 asgiref==3.5.1
 async-timeout==4.0.2
-backports.zoneinfo==0.2.1
 bizerror==0.4.7
 certifi==2021.10.8
 charset-normalizer==2.0.12
