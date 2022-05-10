@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #My apps
     'api.apps.ApiConfig',
     'rest_framework',
+    'drf_yasg',
     'rest_framework_simplejwt',
 ]
 
