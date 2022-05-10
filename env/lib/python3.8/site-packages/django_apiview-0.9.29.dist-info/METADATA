@@ -1,0 +1,171 @@
+Metadata-Version: 2.1
+Name: django-apiview
+Version: 0.9.29
+Summary: A set of django tools to help you create JSON service..
+Home-page: UNKNOWN
+Author: zencore
+Author-email: dobetter@zencore.cn
+License: MIT
+Keywords: django-apiview
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: django
+Requires-Dist: django-redis
+Requires-Dist: django-middleware-global-request
+Requires-Dist: fastutils
+Requires-Dist: bizerror
+Requires-Dist: requests
+
+# django-apiview
+
+A set of django tools to help you create JSON service.
+
+## Install
+
+```
+pip install django-apiview
+```
+
+## Installed Decorators
+
+- @apiview
+- @requires(*required_parameter_names)
+- @choices(field, choices, allow_none=False)
+- @between(field, min, max, include_min=True, include_max=True, annotation=Number, allow_none=False)
+- @rsa_decrypt(field, private_key_instance)
+- @meta_variable(variable_name, meta_name)
+- @cache(key, expire=None, cache_name="default", get_from_cache=True, set_to_cache=True)
+- @safe_apiview(get_client_rsa_publickey, **kwargs)
+- @decode_encrypted_data(result_encoder=cipherutils.SafeBase64Encoder(), privatekey=None, server_rsa_privatekey_filedname="RSA_PRIVATEKEY", encrypted_password_fieldname="encryptedPassword", encrypted_data_fieldname="encryptedData")
+- @check_aclkey(aclkey=None, aclkey_field_name="aclkey")
+    - default aclkey=settings.DJANGO_APIVIEW_ACLKEY
+- @string_length_limit
+
+**Note:**
+
+- @apiview
+    1. apiview = Apiview(SimpleJsonPacker())
+- @safe_apiview(...)
+    1. Requires django_middleware_global_request, see django_middleware_global_request's usage at https://pypi.org/project/django-middleware-global-request/.
+    1. Requires server rsa settings: RSA_PRIVATEKEY_STRING, RSA_PRIVATEKEY (load RSA_PRIVATEKEY_STRING as RsaKey)
+    1. Callback function get_client_rsa_publickey defines: `def get_client_rsa_publickey(client_id): pass`
+    1. kwargs:
+        1. client_id_fieldname = "clientId"
+        1. client_rsa_publickey_fieldname = "CLIENT_RSA_PUBLICKEY"
+        1. result_encoder = cipherutils.SafeBase64Encoder()
+        1. server_rsa_privatekey_filedname = RSA_PRIVATEKEY
+        1. encrypted_password_fieldname = encryptedPassword
+        1. encrypted_data_fieldname = encryptedData
+        1. packer_class = SafeJsonResultPacker
+        1. password_length = 32
+- @cache(...)
+    1. Optional setting: DJANGO_APIVIEW_DISABLE_CACHE_HEADER_NAME = "HTTP_DISABLE_CACHE"
+    1. Optional setting: DJANGO_APIVIEW_DEFAULT_CACHE_EXPIRE = None 
+
+## Usage
+
+
+**Note:**
+
+- Apiview always set csrf_exempt=True.
+- @apiview or @safe_apiview decorator must be the first decorator.
+- Return raw data without serialized, we'll do result pack for you.
+
+
+**app/views.py**
+
+```python
+import time
+from django_apiview.views import apiview
+from django_apiview.views import requires
+from django_apiview.views import choices
+from django_apiview.views import between
+
+@apiview
+def ping():
+    return "pong"
+
+@apiview
+def timestamp():
+    return int(time.time())
+
+@apiview
+@requires("msg")
+def echo(msg: str):
+    return msg
+
+@apiview
+def getBooleanResult(value : bool):
+    return value
+
+@apiview
+def getIntegerResult(value: int):
+    return value
+
+@apiview
+def getBytesResult(value: bytes):
+    return value
+
+@apiview
+@choices("op", ["+", "-", "*", "/"])
+@between("a", 2, 10, include_min=False)
+@between("b", 2, 10, include_max=False)
+def calc(a: int, op: str, b: int):
+    if op == "+":
+        return a + b
+    if op == "-":
+        return a - b
+    if op == "*":
+        return a * b
+    if op == "/":
+        return a / b
+
+@safe_apiview(get_client_rsa_publickey=get_client_rsa_publickey)
+def safe_ping():
+    return "pong"
+
+```
+
+
+## Releases
+
+| Version | Released Time | Content                                                    | Notice |
+| ------ | ---------- | ---------------------------------------------------------------- | ---- |
+| v0.1.0 | 2019/08/27 | 1. First release. | |
+| v0.1.1 | 2019/08/28 | 2. Add PAYLOAD injection, PAYLOAD field has low priority. | |
+| v0.1.2 | 2019/08/29 | 3. Fix form process problem. | |
+| v0.1.3 | 2019/08/31 | 4. Add logging while getting result failed in @apiview.<br />5. Add Map, List annotations. | |
+| v0.2.0 | 2019/12/08 | 6. Using fastutils.typingutils for annotation cast.<br />7. Add result pack mechanism.<br />8. Move example views from the main app to example app and the example app is not include in published package. | |
+| v0.3.1 | 2020/07/01 | 9. Change app name from `apiview` to `django_apiview`.<br />10. Add parameter validators. | `WARN`: NOT backward compatible. |
+| v0.3.2 | 2020/07/18 | 11. Add Apiview class based implementation.<br />12. Add setup_result_packer api.<br />13. Rename simple_json_result_packer to simple_result_packer. | |
+| v0.3.3 | 2020/07/24 | 14. Add rsa_decrypt decorator. | |
+| v0.3.4 | 2020/07/26 | 15. Fix BizError class check problem. | |
+| v0.4.0 | 2020/08/06 | 16. Add meta_variable decorator.<br >17. Datetime value encode to native time, and in format like `2020-08-06 14:41:00`. | |
+| v0.5.0 | 2020/08/13 | 18. Add cache decorator.<br >19. Add func's default values to View.data. | |
+| v0.6.0 | 2020/09/06 | 20. Add safe_apiview. | |
+| v0.7.0 | 2020/09/28 | 21. Add batch_mode parameter support for cache. | |
+| v0.8.0 | 2020/09/30 | 22. Add ApiviewDecorator to make decorator programming easier.<br />23. Fix some function reference problem. | |
+| v0.8.3 | 2020/09/30 | 24. Fix variable reference problem. | |
+| v0.8.4 | 2020/11/18 | 25. Add cache entry_point manage. | |
+| v0.8.6 | 2020/12/24 | 26. Add check_aclkey.<br />27. Parse json data before doing data unpack. | |
+| v0.8.8 | 2021/02/08 | 28. Use logger.exception instead of logger.error, so that we get running stack message.<br />29. use `cache.expire(key, expire)` after `cache.set(key, value)` instread of `cache.set(key, value, keepttl=expire)`. | |
+| v0.8.9 | 2021/02/08 | 30. Fix boolean calc problem. | |
+| v0.9.2 | 2021/02/09 | 31. Add log_api_response_time. | **Removed** |
+| v0.9.7 | 2021/02/21 | 32. Add string_length_limit.<br />33. Fix SimpleJsonResultPacker.unpack. | |
+| v0.9.20 | 2021/02/24 | 34. @requires support A-OR-B model parameters check.<br />35. Fix SimpleJsonResultPacker.unpack if missing success filed.<br />36. Remove api response time log models. Waste resources. Get response time from nginx access log instread.<br />37. make cache cleaners setup easy.  | |
+| v0.9.21 | 2021/02/25 | 38. Update dependent packages' version. | |
+| v0.9.23 | 2021/02/26 | 39. Handle json dumps error at the last step.<br />40. Create response instance first so that you can handle the response instance: _django_apiview_response.<br >41. rsa_decrypt fix None problem. | |
+| v0.9.25 | 2021/03/24 | 42. Fix empty result problem.<br />43. Fix logging problem. | |
+| v0.9.26 | 2021/04/08 | 44. Add cookie_variable. | |
+| v0.9.27 | 2021/04/09 | 45. Fix `between` not using `annotation` parameter problem. | |
+| v0.9.28 | 2021/07/01 | 46. SimpleCacheCleaner Cache cleaner should only do once per request. | |
+| v0.9.29 | 2022/01/18 | 47. Fix pack_result parameter conflict problem. | |
+
+

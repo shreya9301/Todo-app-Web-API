@@ -1,0 +1,3 @@
+[console_scripts]
+bizerror-generator = bizerror.generator:main
+

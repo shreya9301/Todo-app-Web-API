@@ -1,0 +1,60 @@
+Metadata-Version: 2.1
+Name: xlsxhelper
+Version: 0.3.1
+Summary: Excel file manipulation toolset.
+Home-page: UNKNOWN
+Author: zencore
+Author-email: dobetter@zencore.cn
+License: MIT
+Keywords: excel utils
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: openpyxl
+
+# xlsxhelper
+
+Excel file manipulation toolset. 
+
+## Notice
+
+The library is based on library openpyxl, so only xlsx (new excel format) files are supported.
+
+## Help Functions
+
+- get_workbook
+- get_worksheet
+- get_merged_range_string
+- parse_cols
+- parse_rows
+- get_cells
+- set_cells_data
+- load_data_from_workbook
+- get_merged_ranges
+- copy_cells
+- merge_ranges
+
+
+## Releases
+
+### v0.3.1 2022/01/10
+
+- Fix license file missing problem.
+- Add set_cells_data function.
+
+### v0.3.0 2020/07/19
+
+- Add workbook and worksheet create support.
+
+### v0.2.1 2019/08/31
+
+- Fix load_data_from_workbook get raw function statement problem.
+- Fix worksheet.merged_cell_ranges deprecating problem, use worksheet.merged_cells.ranges instead.
+
+

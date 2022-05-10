@@ -1,0 +1,90 @@
+Metadata-Version: 2.1
+Name: django-middleware-global-request
+Version: 0.2.0
+Summary: Django middleware that keep request instance for every thread.
+Home-page: UNKNOWN
+Author: zencore
+Author-email: dobetter@zencore.cn
+License: MIT
+Description: # django-middleware-global-request
+        
+        
+        Django middleware that keep request instance for every thread.
+        
+        ## Install
+        
+        
+        ```shell
+            pip install django-middleware-global-request
+        ```
+        ## Note
+        
+        - It's NOT good to use global request, you should pass the request instance from view to any where you want to use it.
+        - If you use the global request in Model layout, it means when you call the Model method from Django Shell, you get a None request.
+        
+        ## Usage
+        
+        1. Add django application django_global_request to INSTALLED_APPS in settings.py
+        
+            ```python
+            INSTALLED_APPS = [
+                ...
+                'django_middleware_global_request',
+                ...
+            ]
+            ```
+        
+        2. Add GlobalRequestMiddleware to MIDDLEWARE in settings.py
+        
+        
+            ```python
+            MIDDLEWARE = [
+                ...
+                'django_middleware_global_request.middleware.GlobalRequestMiddleware',
+                ...
+            ]
+            ```
+        
+        3. Get request instance with function **get_request** from django_middleware_global_request.middleware
+        
+        
+            ```python
+            from django_middleware_global_request.middleware import get_request
+        
+            class TestModel(models.Model):
+        
+                field1 = models.CharField(max_length=32)
+        
+                def hello(self):
+                    request = get_request()
+                    ...
+            ```
+        
+        
+        ## Releases
+        
+        ### v0.2.0 2020/03/09
+        
+        - Rename the core package from django_global_request to django_middleware_global_request so that it matches with the package name. **Note:** It's NOT backward compatible, all applications that using old name MUST do changes.
+        
+        ### v0.1.2 2019/04/07
+        
+        - Some changes.
+        
+        ### v0.1.1 2018/02/28
+        
+        - Some changes.
+        
+        ### v0.1.0 2017/12/28
+        
+        - First release.
+Keywords: django extensions,django middleware global request
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Requires: django
+Description-Content-Type: text/markdown
