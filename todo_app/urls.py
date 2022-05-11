@@ -19,7 +19,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-
+#swagger interface setup
 schema_view = get_schema_view(
    openapi.Info(
       title="Snippets API",
@@ -32,11 +32,16 @@ schema_view = get_schema_view(
    public=True,
    permission_classes=[permissions.AllowAny],
 )
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # todocontroller api endpoints
     path('api/', include('api.urls')),
+    #authcontroller api endpoints
     path('auth/',include('user_auth.urls')),
+    #swagger 
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    #for test purposes only
     path('api-auth/', include('rest_framework.urls')),
 ]
