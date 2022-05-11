@@ -2,7 +2,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import (
     api_view,permission_classes
 )
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from .permissions import IsAdminUserOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -30,7 +30,7 @@ def apiOverview(request):
 '''Get all todo items'''
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
+@permission_classes((permissions.IsAuthenticated,))
 def GetAllItems(request):
     tasks = Task.objects.all()
     serializer = TaskSerializer(tasks, many=True)
@@ -41,7 +41,7 @@ def GetAllItems(request):
 '''view for the detailed view of a specific item with the help of pk'''
 
 @api_view(['GET'])
-@permission_classes((permissions.IsAuthenticated,))
+@permission_classes((permissions.IsAuthenticated,IsAdminUser,))
 def GetItem(request,pk):
     tasks = Task.objects.get(id = pk)
     serializer = TaskSerializer(tasks,many = False)
@@ -51,7 +51,7 @@ def GetItem(request,pk):
 '''Create a todo item'''
 
 @api_view(['POST'])
-@permission_classes((permissions.IsAuthenticated,))
+@permission_classes((permissions.IsAuthenticated,IsAdminUser,))
 def CreateItem(request):
     serializer = TaskSerializer(data=request.data)
     if serializer.is_valid():
@@ -63,7 +63,7 @@ def CreateItem(request):
 '''Update a specific item with the help of pk'''
 
 @api_view(['POST'])
-@permission_classes((permissions.IsAuthenticated,))
+@permission_classes((permissions.IsAuthenticated,IsAdminUser,))
 def UpdateItem(request,pk):
     task = Task.objects.get(id=pk)
     serializer = TaskSerializer(instance=task,data=request.data)
@@ -77,7 +77,7 @@ def UpdateItem(request,pk):
 '''Delete a specific task with the help of pk'''
 
 @api_view(['DELETE'])
-@permission_classes((permissions.IsAuthenticated,))
+@permission_classes((permissions.IsAuthenticated,IsAdminUser,))
 def DeleteItem(request,pk):
     task = Task.objects.get(id=pk)
     task.delete()
